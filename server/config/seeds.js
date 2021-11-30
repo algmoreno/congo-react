@@ -1,50 +1,86 @@
 const db = require('./connection');
 const { User, Post, Comment } = require('../models');
 
-db.once('open', async () => 
-{
-    console.log("Seeding started");
+db.once('open', async () => {
+  console.log("Seeding started");
 
-    await User.deleteMany();
+  await User.deleteMany();
 
-    let users=[];
-    users.push(await User.create(
-      {
-        firstName: 'Alan',
-        lastName: 'Moreno',
-        userName: 'algmoreno',
-        email: "alg.moreno00@gmail.com",
-        password: "12345",
-        posts: [
-          {
-            posts: [posts[0]._id, posts[1]._id]
-          }
-        ]
-      }
-    ));
-    console.log('Users seeded');
+  let users = [];
+  users.push(await User.create(
+    {
+      firstName: 'Alan',
+      lastName: 'Moreno',
+      userName: 'algmoreno',
+      email: "alg.moreno00@gmail.com",
+      password: "12345",
+      posts: []
+    }
+  ));
+  users.push(await User.create(
+    {
+      firstName: 'test',
+      lastName: 'tester',
+      userName: 'test tickles',
+      email: "test@test.com",
+      password: "12345",
+      posts: []
+    }
+  ));
+  console.log('Users seeded');
 
-    await Post.deleteMany();
+  await Post.deleteMany();
 
-    let post = await Post.create(
-        {
-            postText: 'This is the best food I have ever tasted',
-            user: users[0]._id,
-        });
+  let post = await Post.create(
+    {
+      postText: 'This is the best food I have ever tasted',
+      user: user[0]._id,
+    });
 
-    let user = await User.findOneAndUpdate(
-        { _id: users[0]._id },
-        { $push: { posts: post._id } },
-        { new: true });
+  let user = await User.findOneAndUpdate(
+    { _id: user[0]._id },
+    { $push: { post: post._id } },
+    { new: true });
 
-    post = await Post.create(
-        {
-            postText: 'this is a test post to see if everything works',
-            user: users[0]._id,
-        });
+  post = await Post.create(
+    {
+      postText: 'this is a test post to see if everything works',
+      user: user[0]._id,
+    });
 
-    user = await User.findOneAndUpdate(
-        { _id: users[1]._id },
-        { $push: { posts: post._id } },
-        { new: true });
+  user = await User.findOneAndUpdate(
+    { _id: user[0]._id },
+    { $push: { post: post._id } },
+    { new: true });
+
+  post = await Post.create(
+    {
+      postText: 'this is a second test post',
+      user: user[0]._id,
+    });
+
+  user = await User.findOneAndUpdate(
+    { _id: user[0]._id },
+    { $push: { post: post._id } },
+    { new: true });
+
+  console.log('posts seeded')
+
+  let comment = await Comment.create(
+    {
+      commentText: 'nice post bro',
+      user: user[1]._id,
+      post: post[0]._id
+    }
+  )
+
+  user = await User.findOneAndUpdate(
+    { _id: user[1]._id },
+    { $push: { comment: comment._id } },
+    { new: true }
+  )
+
+  console.log('comments seeded')
+
+  process.exit();
 })
