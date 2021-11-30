@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const db = require('./config/connection');
+const { ApolloServerPluginLandingPageGraphQLPlayground } = require('apollo-server-core');
 const { ApolloServer } = require('apollo-server-express');
 const { typeDefs, resolvers } = require('./schemas');
 const { authMiddleWare } = require('./utils/auth');
@@ -16,7 +17,10 @@ async function startServer()
       {
         typeDefs,
         resolvers,
-        context: authMiddleWare
+        context: authMiddleWare,
+
+        plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
+        playground: true
       });
     await server.start();
 

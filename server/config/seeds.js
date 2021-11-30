@@ -34,18 +34,18 @@ db.once('open', async () => {
   let post = await Post.create(
     {
       postText: 'This is the best food I have ever tasted',
-      user: user[0]._id,
+      user: users[0]._id,
     });
 
   let user = await User.findOneAndUpdate(
-    { _id: user[0]._id },
+    { _id: users[0]._id },
     { $push: { post: post._id } },
     { new: true });
 
   post = await Post.create(
     {
       postText: 'this is a test post to see if everything works',
-      user: user[0]._id,
+      user: users[0]._id,
     });
 
   user = await User.findOneAndUpdate(
@@ -56,11 +56,11 @@ db.once('open', async () => {
   post = await Post.create(
     {
       postText: 'this is a second test post',
-      user: user[0]._id,
+      user: users[0]._id,
     });
 
   user = await User.findOneAndUpdate(
-    { _id: user[0]._id },
+    { _id: users[0]._id },
     { $push: { post: post._id } },
     { new: true });
 
@@ -69,13 +69,13 @@ db.once('open', async () => {
   let comment = await Comment.create(
     {
       commentText: 'nice post bro',
-      user: user[1]._id,
+      user: users[1]._id,
       post: post[0]._id
     }
   )
 
   user = await User.findOneAndUpdate(
-    { _id: user[1]._id },
+    { _id: users[1]._id },
     { $push: { comment: comment._id } },
     { new: true }
   )
