@@ -1,8 +1,8 @@
 const express = require('express');
+const { ApolloServer } = require('apollo-server-express');
 const path = require('path');
 const db = require('./config/connection');
 const { ApolloServerPluginLandingPageGraphQLPlayground } = require('apollo-server-core');
-const { ApolloServer } = require('apollo-server-express');
 const { typeDefs, resolvers } = require('./schemas');
 const { authMiddleWare } = require('./utils/auth');
 
@@ -11,40 +11,36 @@ const app = express();
 
 let serverPath = "";
 
-async function startServer()
-{
-    const server = new ApolloServer(
-      {
-        typeDefs,
-        resolvers,
-        context: authMiddleWare,
+async function startServer() {
+  const server = new ApolloServer(
+    {
+      typeDefs,
+      resolvers,
+      context: authMiddleWare,
+      plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
+      playground: true
+    });
 
-        plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
-        playground: true
-      });
-    await server.start();
+  await server.start();
+  server.applyMiddleware({ app });
 
-    server.applyMiddleware({ app });
+  app.use(express.urlencoded({ extended: false }));
+  app.use(express.json());
 
-    serverPath = server.graphqlPath;
-};
+  if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname, '../client/build')));
+  }
 
-startServer();
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/build/index.html'));
+  })
 
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
-
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../client/build')));
+  db.once('open', () => {
+    app.listen(PORT, () => {
+      console.log(`API server running on port ${PORT}`);
+      console.log(`Use GraphQL at http://localhost:${PORT}${server.graphqlPath}`);
+    });
+  });
 }
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/build/index.html'));
-})
-
-db.once('open', () => {
-  app.listen(PORT, () => {
-    console.log( `API server running on port ${PORT}`);
-    console.log(`Use GraphQL at http://localhost:${PORT}${serverPath}`);
-  });
-});
+startServer();
