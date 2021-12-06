@@ -19,12 +19,10 @@ const resolvers =
       throw new AuthenticationError('Not logged in');
     },
     user: async () => {
-      // return await User.find().populate({ path: "posts", populate: "posts" });
-      return 'Hello'
+      return await User.find().populate({ path: "posts", populate: "posts" });
     },
     user: async () => {
-      // return await User.findById(_id).populate({ path: "posts", populate: "posts " })
-      return 'OY mate'
+      return await User.findById(_id).populate({ path: "posts", populate: "posts " })
     },
     posts: async (parent, { user }) => {
       const params = {};
